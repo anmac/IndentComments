@@ -65,18 +65,21 @@
 {
     // Add Plugins menu next to Window menu
     NSMenu *mainMenu = [NSApp mainMenu];
-    NSMenuItem *pluginsMenuItem = [mainMenu itemWithTitle:@"Plugins"];
-    if (!pluginsMenuItem) {
-        pluginsMenuItem = [[NSMenuItem alloc] init];
-        pluginsMenuItem.title = @"Plugins";
-        pluginsMenuItem.submenu = [[NSMenu alloc] initWithTitle:pluginsMenuItem.title];
-        NSInteger windowIndex = [mainMenu indexOfItemWithTitle:@"Window"];
-        [mainMenu insertItem:pluginsMenuItem atIndex:windowIndex];
-    }
+    NSMenuItem *pluginsMenuItem = [mainMenu itemWithTitle:@"Window"];
+    //if (!pluginsMenuItem) {
+        //pluginsMenuItem = [[NSMenuItem alloc] init];
+        //pluginsMenuItem.title = @"Plugins";
+        //pluginsMenuItem.submenu = [[NSMenu alloc] initWithTitle:pluginsMenuItem.title];
+        //NSInteger windowIndex = [mainMenu indexOfItemWithTitle:@"Window"];
+        //[mainMenu insertItem:pluginsMenuItem atIndex:windowIndex];
+    //}
+    
+    
+    [pluginsMenuItem.submenu addItem:[NSMenuItem separatorItem]];
     
     // Add Subitem
     NSMenuItem *subMenuItem = [[NSMenuItem alloc] init];
-    subMenuItem.title = @"Enable Indent Comments";
+    subMenuItem.title = @"注释对齐";
     subMenuItem.target = self;
     subMenuItem.action = @selector(toggleMenu:);
     subMenuItem.state = NSOnState;
