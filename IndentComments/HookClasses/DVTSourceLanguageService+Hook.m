@@ -42,29 +42,26 @@
     }
     //找出需要注释的行(最后一行需要排除)
     NSMutableArray *codeLine  = [NSMutableArray new];
+    //标记一个变量,查询最前面的位置(其他代码与这一行对齐)
+    NSInteger location = NSNotFound;
     for(NSString *tempCode in [commentLines componentsSeparatedByString:@"\n"])
     {
         //最后一行是空字符串,进不了if语句
-        if([tempCode hasPrefix:lineCommentPrefix])
+        BOOL prefix = [tempCode hasPrefix:lineCommentPrefix];
+        BOOL nonull = tempCode.length>lineCommentPrefix.length;
+        if(prefix && nonull)
         {
-            [codeLine addObject:[tempCode substringFromIndex:lineCommentPrefix.length]];
+            //提取出注释行的代码
+            NSString *commentingString = [tempCode substringFromIndex:lineCommentPrefix.length];
+            [codeLine addObject:commentingString];
+            NSRange range = [commentingString rangeOfString:@"[^\\s]" options:NSRegularExpressionSearch];
+            location = MIN(location, range.location);
         }
     }
     //这里处理一下取消注释的处理,没有需要注释的代码行时,直接弹出
     if(codeLine.count==0)
     {
         return commentLines;
-    }
-    //标记一个变量,查询最前面的位置(其他代码与这一行对齐)
-    NSInteger location = NSNotFound;
-    //理论上进入到这个位置了,每一行代码最前面都会是//开始(不使用IndentComments插件)
-    for(NSString *commentingString in codeLine)
-    {
-        NSRange range = [commentingString rangeOfString:@"[^\\s]" options:NSRegularExpressionSearch];
-        if(commentingString.length>0)
-        {
-            location = MIN(location, range.location);
-        }
     }
     //容错排除
     if(location == NSNotFound)
@@ -85,7 +82,15 @@
         [commentCode appendString:mutableString];
         [commentCode appendString:@"\n"];
     }
-    return commentCode;
+
+    //排除////的情况
+    //理论上本函数其实只做了一件事,就是将最前的//移动到合适的位置,所以总长度应该是不变的,除非受到其他干扰
+    if(commentCode.length==commentLines.length)
+    {
+        return commentCode;
+    }else{
+        return commentLines;
+    }
 }
 
 
@@ -105,15 +110,15 @@
 //        }
 //    }
 //    
-//    // Check if the string contains nonwhitespace character
-//    NSRange range = [commentingString rangeOfString:@"[^\\s]" options:NSRegularExpressionSearch];
-//    if (range.location == NSNotFound) {
-//        return commentingString;
-//    }
-//    
+    //// Check if the string contains nonwhitespace character
+    //NSRange range = [commentingString rangeOfString:@"[^\\s]" options:NSRegularExpressionSearch];
+    //if (range.location == NSNotFound) {
+    //    return commentingString;
+    //}
+//
 //    NSMutableString *mutableString = [commentingString mutableCopy];
 //    [mutableString insertString:lineCommentPrefix atIndex:range.location];
-//    return [mutableString copy];
+////    return [mutableString copy];
 //}
 
 @end
